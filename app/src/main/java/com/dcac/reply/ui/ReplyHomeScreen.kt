@@ -71,14 +71,20 @@ fun ReplyHomeScreen(
             text = stringResource(id = R.string.tab_spam)
         )
     )
-    ReplyAppContent(
-        replyUiState = replyUiState,
-        onTabPressed = onTabPressed,
-        onEmailCardPressed = onEmailCardPressed,
-        onDetailScreenBackPressed = onDetailScreenBackPressed,
-        navigationItemContentList = navigationItemContentList,
-        modifier = modifier
-    )
+    if (replyUiState.isShowingHomepage) {
+        ReplyAppContent(
+            replyUiState = replyUiState,
+            onTabPressed = onTabPressed,
+            onEmailCardPressed = onEmailCardPressed,
+            navigationItemContentList = navigationItemContentList,
+            modifier = modifier)
+    } else {
+        ReplyDetailsScreen(
+            replyUiState = replyUiState,
+            onBackPressed = onDetailScreenBackPressed,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
@@ -86,11 +92,9 @@ private fun ReplyAppContent(
     replyUiState: ReplyUiState,
     onTabPressed: ((MailboxType) -> Unit),
     onEmailCardPressed: (Email) -> Unit,
-    onDetailScreenBackPressed: () -> Unit,
     navigationItemContentList: List<NavigationItemContent>,
     modifier: Modifier = Modifier,
 ) {
-    val isTablet = isTablet()
     Box(modifier = modifier) {
         val navigationRailContentDescription = stringResource(R.string.navigation_rail)
         ReplyNavigationRail(
@@ -105,43 +109,15 @@ private fun ReplyAppContent(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
         ) {
-            if (replyUiState.isShowingHomepage) {
-                //Disply email List
-                ReplyListOnlyContent(
-                    replyUiState = replyUiState,
-                    onEmailCardPressed = onEmailCardPressed,
-                    modifier = Modifier.weight(1f)
-                        .padding(
-                            horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
-                        )
-                )
-            } else {
-                if (isTablet) {
-                    //LIST AND DETAILS
-                    ReplyListAndDetailContent(
-                        replyUiState = replyUiState,
-                        onEmailCardPressed = onEmailCardPressed,
-                        onDetailScreenBackPressed = onDetailScreenBackPressed,
-                        modifier = Modifier.weight(1f)
-                            .padding(
-                                horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
-                            )
+            ReplyListOnlyContent(
+                replyUiState = replyUiState,
+                onEmailCardPressed = onEmailCardPressed,
+                modifier = Modifier.weight(1f)
+                    .padding(
+                        horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
                     )
-                } else {
-                    //DETAILS
-                    ReplyDetailsScreen(
-                        replyUiState = replyUiState,
-                        onBackPressed = onDetailScreenBackPressed,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(
-                                horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
-                            )
-                    )
-                }
-
-            }
-            //val bottomNavigationContentDescription = stringResource(R.string.navigation_bottom)
+            )
+            val bottomNavigationContentDescription = stringResource(R.string.navigation_bottom)
             ReplyBottomNavigationBar(
                 currentTab = replyUiState.currentMailbox,
                 onTabPressed = onTabPressed,
@@ -259,13 +235,6 @@ private data class NavigationItemContent(
     val icon: ImageVector,
     val text: String
 )
-
-@Composable
-fun isTablet(): Boolean {
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp
-    return screenWidthDp >= 600
-}
 
 @Preview(showBackground = true)
 @Composable

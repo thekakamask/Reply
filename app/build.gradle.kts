@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material3.window.size)
+    implementation(libs.androidx.material3.window.size.android)
 
 
     testImplementation(libs.junit)
