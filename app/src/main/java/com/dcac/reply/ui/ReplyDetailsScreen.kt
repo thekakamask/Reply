@@ -25,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,9 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.dcac.reply.R
 import com.dcac.reply.data.Email
 import com.dcac.reply.data.MailboxType
+import com.dcac.reply.data.local.LocalEmailsDataProvider
+import com.dcac.reply.ui.theme.ReplyTheme
 
 @Composable
 fun ReplyDetailsScreen(
@@ -151,6 +155,39 @@ private fun ReplyEmailDetailsCard(
 }
 
 @Composable
+private fun DetailsScreenHeader(email: Email, modifier: Modifier = Modifier) {
+    Row(modifier = modifier) {
+        ReplyProfileImage(
+            drawableResource = email.sender.avatar,
+            description = stringResource(email.sender.firstName) + " "
+                    + stringResource(email.sender.lastName),
+            modifier = Modifier.size(
+                dimensionResource(R.dimen.email_header_profile_size)
+            )
+        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    horizontal = dimensionResource(R.dimen.email_header_content_padding_horizontal),
+                    vertical = dimensionResource(R.dimen.email_header_content_padding_vertical)
+                ),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(email.sender.firstName),
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = stringResource(email.createdAt),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
+    }
+}
+
+@Composable
 private fun DetailsScreenButtonBar(
     mailboxType: MailboxType,
     displayToast: (String) -> Unit,
@@ -215,39 +252,6 @@ private fun DetailsScreenButtonBar(
 }
 
 @Composable
-private fun DetailsScreenHeader(email: Email, modifier: Modifier = Modifier) {
-    Row(modifier = modifier) {
-        ReplyProfileImage(
-            drawableResource = email.sender.avatar,
-            description = stringResource(email.sender.firstName) + " "
-                    + stringResource(email.sender.lastName),
-            modifier = Modifier.size(
-                dimensionResource(R.dimen.email_header_profile_size)
-            )
-        )
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(
-                    horizontal = dimensionResource(R.dimen.email_header_content_padding_horizontal),
-                    vertical = dimensionResource(R.dimen.email_header_content_padding_vertical)
-                ),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(email.sender.firstName),
-                style = MaterialTheme.typography.labelMedium
-            )
-            Text(
-                text = stringResource(email.createdAt),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-    }
-}
-
-@Composable
 private fun ActionButton(
     text: String,
     onButtonClicked: (String) -> Unit,
@@ -277,6 +281,26 @@ private fun ActionButton(
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ReplyDetailsScreenPreview() {
+    val exampleEmail = LocalEmailsDataProvider.allEmails.first()
+    val exampleUiState = ReplyUiState(
+        mailboxes = LocalEmailsDataProvider.allEmails.groupBy { it.mailbox },
+        currentMailbox = MailboxType.Inbox,
+        currentSelectedEmail = exampleEmail,
+        isShowingHomepage = false
+    )
+    ReplyTheme {
+        Surface {
+            ReplyDetailsScreen(
+                replyUiState = exampleUiState,
+                onBackPressed = {}
             )
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,9 +34,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import com.dcac.reply.R
 import com.dcac.reply.data.Email
+import com.dcac.reply.data.MailboxType
 import com.dcac.reply.data.local.LocalAccountsDataProvider
+import com.dcac.reply.data.local.LocalEmailsDataProvider
+import com.dcac.reply.ui.theme.ReplyTheme
 
 @Composable
 fun ReplyListOnlyContent(
@@ -72,9 +77,60 @@ fun ReplyListOnlyContent(
 }
 
 @Composable
+private fun ReplyHomeTopBar(modifier: Modifier = Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        ReplyLogo(
+            modifier = Modifier
+                .size(dimensionResource(R.dimen.topbar_logo_size))
+                .padding(start = dimensionResource(R.dimen.topbar_logo_padding_start))
+        )
+        ReplyProfileImage(
+            drawableResource = LocalAccountsDataProvider.defaultAccount.avatar,
+            description = stringResource(R.string.profile),
+            modifier = Modifier
+                .padding(end = dimensionResource(R.dimen.topbar_profile_image_padding_end))
+                .size(dimensionResource(R.dimen.topbar_profile_image_size))
+        )
+    }
+}
+
+@Composable
+fun ReplyLogo(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary
+) {
+    Image(
+        painter = painterResource(R.drawable.logo),
+        contentDescription = stringResource(R.string.logo),
+        colorFilter = ColorFilter.tint(color),
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ReplyProfileImage(
+    @DrawableRes drawableResource: Int,
+    description: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
+        Image(
+            modifier = Modifier.clip(CircleShape),
+            painter = painterResource(drawableResource),
+            contentDescription = description,
+        )
+    }
+}
+
+@Composable
 fun ReplyListAndDetailContent(
     replyUiState: ReplyUiState,
     onEmailCardPressed: (Email) -> Unit,
+    onDetailScreenBackPressed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val emails = replyUiState.currentMailboxEmails
@@ -107,7 +163,7 @@ fun ReplyListAndDetailContent(
             modifier = Modifier
                 .padding(top = dimensionResource(R.dimen.email_list_item_vertical_spacing))
                 .weight(1f),
-            onBackPressed = {}
+            onBackPressed = onDetailScreenBackPressed
         )
     }
 }
@@ -190,52 +246,23 @@ private fun ReplyEmailItemHeader(email: Email, modifier: Modifier = Modifier) {
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun ReplyProfileImage(
-    @DrawableRes drawableResource: Int,
-    description: String,
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier = modifier) {
-        Image(
-            modifier = Modifier.clip(CircleShape),
-            painter = painterResource(drawableResource),
-            contentDescription = description,
-        )
-    }
-}
-
-@Composable
-fun ReplyLogo(
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary
-) {
-    Image(
-        painter = painterResource(R.drawable.logo),
-        contentDescription = stringResource(R.string.logo),
-        colorFilter = ColorFilter.tint(color),
-        modifier = modifier
+fun ReplyHomeContentPreview() {
+    val exampleUiState = ReplyUiState(
+        mailboxes = mapOf(
+            MailboxType.Inbox to LocalEmailsDataProvider.allEmails.take(5) // Prend les 5 premiers emails fictifs
+        ),
+        currentMailbox = MailboxType.Inbox,
+        currentSelectedEmail = LocalEmailsDataProvider.allEmails.first() // Prend le premier email comme sélectionné
     )
-}
+    ReplyTheme {
+        Surface {
+            ReplyListOnlyContent(
+                replyUiState = exampleUiState,
+                onEmailCardPressed = { /* No-op for preview */ }
+            )
 
-@Composable
-private fun ReplyHomeTopBar(modifier: Modifier = Modifier) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-    ) {
-        ReplyLogo(
-            modifier = Modifier
-                .size(dimensionResource(R.dimen.topbar_logo_size))
-                .padding(start = dimensionResource(R.dimen.topbar_logo_padding_start))
-        )
-        ReplyProfileImage(
-            drawableResource = LocalAccountsDataProvider.defaultAccount.avatar,
-            description = stringResource(R.string.profile),
-            modifier = Modifier
-                .padding(end = dimensionResource(R.dimen.topbar_profile_image_padding_end))
-                .size(dimensionResource(R.dimen.topbar_profile_image_size))
-        )
+        }
     }
 }

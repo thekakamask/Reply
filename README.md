@@ -8,7 +8,7 @@
    - ✉️ **Email list**:
       - View the list of emails associated with each inbox.
       - Select an email to view its contents in detail.
-   - 📜 **Email details**: 🔴 <span style="color: red;">**FUTURE FUNCTIONALITIES**</span>
+   - 📜 **Email details**:
       - View an email's information: sender, recipients, subject, message body, date sent.
       - Different actions possible depending on category:
          - Reply or reply all.  🔴 <span style="color: red;">**NOT WORKING YET**</span>

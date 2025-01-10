@@ -22,19 +22,24 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.dcac.reply.R
 import com.dcac.reply.data.Email
 import com.dcac.reply.data.MailboxType
 import com.dcac.reply.data.local.LocalAccountsDataProvider
+import com.dcac.reply.data.local.LocalEmailsDataProvider
+import com.dcac.reply.ui.theme.ReplyTheme
 
 @Composable
 fun ReplyHomeScreen(
@@ -70,6 +75,7 @@ fun ReplyHomeScreen(
         replyUiState = replyUiState,
         onTabPressed = onTabPressed,
         onEmailCardPressed = onEmailCardPressed,
+        onDetailScreenBackPressed = onDetailScreenBackPressed,
         navigationItemContentList = navigationItemContentList,
         modifier = modifier
     )
@@ -80,9 +86,11 @@ private fun ReplyAppContent(
     replyUiState: ReplyUiState,
     onTabPressed: ((MailboxType) -> Unit),
     onEmailCardPressed: (Email) -> Unit,
+    onDetailScreenBackPressed: () -> Unit,
     navigationItemContentList: List<NavigationItemContent>,
     modifier: Modifier = Modifier,
 ) {
+    val isTablet = isTablet()
     Box(modifier = modifier) {
         val navigationRailContentDescription = stringResource(R.string.navigation_rail)
         ReplyNavigationRail(
@@ -97,15 +105,43 @@ private fun ReplyAppContent(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
         ) {
-            ReplyListOnlyContent(
-                replyUiState = replyUiState,
-                onEmailCardPressed = onEmailCardPressed,
-                modifier = Modifier.weight(1f)
-                    .padding(
-                        horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
+            if (replyUiState.isShowingHomepage) {
+                //Disply email List
+                ReplyListOnlyContent(
+                    replyUiState = replyUiState,
+                    onEmailCardPressed = onEmailCardPressed,
+                    modifier = Modifier.weight(1f)
+                        .padding(
+                            horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
+                        )
+                )
+            } else {
+                if (isTablet) {
+                    //LIST AND DETAILS
+                    ReplyListAndDetailContent(
+                        replyUiState = replyUiState,
+                        onEmailCardPressed = onEmailCardPressed,
+                        onDetailScreenBackPressed = onDetailScreenBackPressed,
+                        modifier = Modifier.weight(1f)
+                            .padding(
+                                horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
+                            )
                     )
-            )
-            val bottomNavigationContentDescription = stringResource(R.string.navigation_bottom)
+                } else {
+                    //DETAILS
+                    ReplyDetailsScreen(
+                        replyUiState = replyUiState,
+                        onBackPressed = onDetailScreenBackPressed,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(
+                                horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)
+                            )
+                    )
+                }
+
+            }
+            //val bottomNavigationContentDescription = stringResource(R.string.navigation_bottom)
             ReplyBottomNavigationBar(
                 currentTab = replyUiState.currentMailbox,
                 onTabPressed = onTabPressed,
@@ -223,3 +259,33 @@ private data class NavigationItemContent(
     val icon: ImageVector,
     val text: String
 )
+
+@Composable
+fun isTablet(): Boolean {
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp
+    return screenWidthDp >= 600
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ReplyHomeScreenPreview() {
+    val exampleUiState = ReplyUiState(
+        mailboxes = mapOf(
+            MailboxType.Inbox to LocalEmailsDataProvider.allEmails.take(5)
+        ),
+        currentMailbox = MailboxType.Inbox,
+        currentSelectedEmail = LocalEmailsDataProvider.allEmails.first()
+    )
+
+    ReplyTheme {
+        Surface {
+            ReplyHomeScreen(
+                replyUiState = exampleUiState,
+                onTabPressed = { /* No-op for preview */ },
+                onEmailCardPressed = { /* No-op for preview */ },
+                onDetailScreenBackPressed = { /* No-op for preview */ }
+            )
+        }
+    }
+}
