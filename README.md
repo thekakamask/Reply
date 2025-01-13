@@ -4,7 +4,7 @@
 ## 🚀 **Features**
    - 📂 **Mailbox browsing**:
       - Access different categories: Inbox, Drafts, Sent, Spam.
-      - Easily change categories via a Navigation Rail, Navigation Drawer 🔴 <span style="color: red;">**NOT WORKING YET**</span>, or bottom navigation bar.
+      - Easily change categories via a Navigation Rail, Navigation Drawer and Bottom Navigation Bar (depending on hardware screen size).
    - ✉️ **Email list**:
       - View the list of emails associated with each inbox.
       - Select an email to view its contents in detail.
@@ -19,6 +19,7 @@
       - Use of Jetpack Compose for a declarative interface.
       - Material 3 integration for accessible, modern design.
       - Support for dark and light themes.
+      - Use of windowSizeClass to display a better user interface depending on screen size.
 
 ## 🛠️ **Tech Stack**:
    - Kotlin: Modern, concise language for Android development.
