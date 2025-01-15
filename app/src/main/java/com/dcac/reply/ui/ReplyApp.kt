@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dcac.reply.data.Email
 import com.dcac.reply.data.MailboxType
+import com.dcac.reply.ui.utils.ReplyContentType
 import com.dcac.reply.ui.utils.ReplyNavigationType
 
 @Composable
@@ -17,29 +18,38 @@ fun ReplyApp(
 ) {
     val viewModel: ReplyViewModel = viewModel()
     val replyUiState = viewModel.uiState.collectAsState().value
+    val navigationType: ReplyNavigationType
+    val contentType: ReplyContentType
 
-    val navigationType: ReplyNavigationType = when {
-        windowSize == WindowWidthSizeClass.Compact -> {
-            ReplyNavigationType.BOTTOM_NAVIGATION
+    when(windowSize) {
+        WindowWidthSizeClass.Compact -> {
+            navigationType = ReplyNavigationType.BOTTOM_NAVIGATION
+            contentType = ReplyContentType.LIST_ONLY
         }
-        windowSize == WindowWidthSizeClass.Medium -> {
-            ReplyNavigationType.NAVIGATION_RAIL
+        WindowWidthSizeClass.Medium -> {
+            navigationType =ReplyNavigationType.NAVIGATION_RAIL
+            contentType = ReplyContentType.LIST_ONLY
         }
-        windowSize == WindowWidthSizeClass.Expanded -> {
+        WindowWidthSizeClass.Expanded -> {
             val isLandscapeSmartphone = isLandscapeSmartphone()
             if (isLandscapeSmartphone) {
-                ReplyNavigationType.NAVIGATION_RAIL // Display rail on smartphone landscape
+                navigationType = ReplyNavigationType.NAVIGATION_RAIL // Display rail on smartphone landscape
+                contentType = ReplyContentType.LIST_ONLY
+
             } else {
-                ReplyNavigationType.PERMANENT_NAVIGATION_DRAWER // Drawer for tablet
+                navigationType = ReplyNavigationType.PERMANENT_NAVIGATION_DRAWER // Drawer for tablet
+                contentType = ReplyContentType.LIST_AND_DETAIL
             }
         }
         else -> {
-            ReplyNavigationType.BOTTOM_NAVIGATION
+            navigationType = ReplyNavigationType.BOTTOM_NAVIGATION
+            contentType = ReplyContentType.LIST_ONLY
         }
     }
 
     ReplyHomeScreen(
         navigationType = navigationType,
+        contentType = contentType,
         replyUiState = replyUiState,
         onTabPressed = { mailboxType: MailboxType ->
             viewModel.updateCurrentMailbox(mailboxType = mailboxType)

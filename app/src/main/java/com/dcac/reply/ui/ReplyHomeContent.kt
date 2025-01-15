@@ -130,7 +130,6 @@ fun ReplyProfileImage(
 fun ReplyListAndDetailContent(
     replyUiState: ReplyUiState,
     onEmailCardPressed: (Email) -> Unit,
-    onDetailScreenBackPressed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val emails = replyUiState.currentMailboxEmails
@@ -163,7 +162,7 @@ fun ReplyListAndDetailContent(
             modifier = Modifier
                 .padding(top = dimensionResource(R.dimen.email_list_item_vertical_spacing))
                 .weight(1f),
-            onBackPressed = onDetailScreenBackPressed
+            onBackPressed = {}
         )
     }
 }
