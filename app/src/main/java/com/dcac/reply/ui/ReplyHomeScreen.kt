@@ -83,8 +83,10 @@ fun ReplyHomeScreen(
     if (navigationType == ReplyNavigationType.PERMANENT_NAVIGATION_DRAWER) {
         val navigationDrawerContentDescription = stringResource(R.string.navigation_drawer)
         PermanentNavigationDrawer(
+            modifier = Modifier.testTag(navigationDrawerContentDescription),
             drawerContent = {
-                PermanentDrawerSheet(Modifier.width(dimensionResource(R.dimen.drawer_width)),
+                PermanentDrawerSheet(Modifier
+                    .width(dimensionResource(R.dimen.drawer_width)),
                     drawerContainerColor = MaterialTheme.colorScheme.inverseOnSurface
                 ) {
                     NavigationDrawerContent(
@@ -98,7 +100,6 @@ fun ReplyHomeScreen(
                     )
                 }
             },
-            modifier = Modifier.testTag(navigationDrawerContentDescription)
         ) {
             ReplyAppContent(
                 navigationType = navigationType,
@@ -124,6 +125,7 @@ fun ReplyHomeScreen(
         } else {
             ReplyDetailsScreen(
                 replyUiState = replyUiState,
+                isFullScreen = true,
                 onBackPressed = onDetailScreenBackPressed,
                 modifier = modifier
             )
@@ -148,7 +150,8 @@ private fun ReplyAppContent(
                 currentTab = replyUiState.currentMailbox,
                 onTabPressed = onTabPressed,
                 navigationItemContentList = navigationItemContentList,
-                modifier = Modifier.testTag(navigationRailContentDescription)
+                modifier = Modifier
+                    .testTag(navigationRailContentDescription)
             )
         }
         Column(
@@ -173,10 +176,13 @@ private fun ReplyAppContent(
                 )
             }
             AnimatedVisibility(visible = navigationType == ReplyNavigationType.BOTTOM_NAVIGATION) {
+                val bottomNavigationContentDescription = stringResource(R.string.navigation_bottom)
                 ReplyBottomNavigationBar(
                     currentTab = replyUiState.currentMailbox,
                     onTabPressed = onTabPressed,
-                    navigationItemContentList = navigationItemContentList
+                    navigationItemContentList = navigationItemContentList,
+                    modifier = Modifier
+                        .testTag(bottomNavigationContentDescription)
                 )
             }
         }
@@ -191,17 +197,22 @@ private fun ReplyNavigationRail(
     modifier: Modifier = Modifier
 ) {
     NavigationRail(modifier = modifier) {
-        for (navItem in navigationItemContentList) {
-            NavigationRailItem(
-                selected = currentTab == navItem.mailboxType,
-                onClick = { onTabPressed(navItem.mailboxType) },
-                icon = {
-                    Icon(
-                        imageVector = navItem.icon,
-                        contentDescription = navItem.text
-                    )
-                }
-            )
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            for (navItem in navigationItemContentList) {
+                NavigationRailItem(
+                    selected = currentTab == navItem.mailboxType,
+                    onClick = { onTabPressed(navItem.mailboxType) },
+                    icon = {
+                        Icon(
+                            imageVector = navItem.icon,
+                            contentDescription = navItem.text
+                        )
+                    }
+                )
+            }
         }
     }
 }

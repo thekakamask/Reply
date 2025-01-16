@@ -156,7 +156,6 @@ fun ReplyListAndDetailContent(
                 )
             }
         }
-        val activity = LocalContext.current as Activity
         ReplyDetailsScreen(
             replyUiState = replyUiState,
             modifier = Modifier

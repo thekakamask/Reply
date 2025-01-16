@@ -70,7 +70,7 @@ fun calculateLandscapeSafePadding(): PaddingValues {
 
         return if (endInset > startInset) {
             // Camera at left (start)
-            PaddingValues(start = startInset, end = 0.dp)git 
+            PaddingValues(start = startInset, end = 0.dp)
         } else if(startInset > endInset) {
             // Camera at right (end)
             PaddingValues(start = 0.dp, end = startInset)
@@ -78,8 +78,6 @@ fun calculateLandscapeSafePadding(): PaddingValues {
             PaddingValues(0.dp)
         }
     }
-
-    // Mode portrait : aucune marge spécifique nécessaire
     return PaddingValues(0.dp)
 }
 
